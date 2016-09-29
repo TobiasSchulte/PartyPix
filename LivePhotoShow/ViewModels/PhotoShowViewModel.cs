@@ -1,12 +1,11 @@
-﻿using System.Windows;
-using Caliburn.Micro;
+﻿using Caliburn.Micro;
 using LivePhotoShow.Messages;
 
 namespace LivePhotoShow.ViewModels
 {
     class PhotoShowViewModel : Screen, IHandle<ShowPhoto>
     {
-        private WindowState windowState;
+        private readonly IEventAggregator eventAggregator;
 
         private string photoPath;
 
@@ -29,7 +28,9 @@ namespace LivePhotoShow.ViewModels
 
         public PhotoShowViewModel(IEventAggregator eventAggregator)
         {
-            eventAggregator.Subscribe(this);
+            this.eventAggregator = eventAggregator;
+
+            this.eventAggregator.Subscribe(this);
         }
 
         public void Handle(ShowPhoto message)
@@ -37,9 +38,9 @@ namespace LivePhotoShow.ViewModels
             this.PhotoPath = message.Path;
         }
 
-        private void ToggleFullScreen()
+        protected override void OnDeactivate(bool close)
         {
-
+            this.eventAggregator.PublishOnUIThread(new PhotoShowClosed());
         }
     }
 }

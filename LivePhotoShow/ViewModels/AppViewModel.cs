@@ -6,7 +6,7 @@ using LivePhotoShow.Messages;
 
 namespace LivePhotoShow.ViewModels
 {
-    class AppViewModel : Screen
+    class AppViewModel : Screen, IHandle<PhotoShowClosed>
     {
         private IWindowManager windowManager;
         private IEventAggregator eventAggregator;
@@ -18,6 +18,8 @@ namespace LivePhotoShow.ViewModels
             this.windowManager = windowManager;
             this.eventAggregator = eventAggregator;
             this.photoShowViewModel = photoShowViewModel;
+
+            this.eventAggregator.Subscribe(this);
         }
 
         protected override void OnDeactivate(bool close)
@@ -34,6 +36,7 @@ namespace LivePhotoShow.ViewModels
             if (this.liveViewVisible)
             {
                 this.photoShowViewModel.TryClose();
+                // liveViewVisible will be set to false by method Handle(PhotoShowClosed message)
             }
             else
             {
@@ -48,13 +51,16 @@ namespace LivePhotoShow.ViewModels
 
                 var settings = new Dictionary<string, object>
                 {
-                    { "Top", targetScreen.WorkingArea.Top + 10  },
-                    { "Left", targetScreen.WorkingArea.Left + 10 }
+                    { "Top", targetScreen.WorkingArea.Top },
+                    { "Left", targetScreen.WorkingArea.Left },
+                    { "Width", targetScreen.WorkingArea.Width },
+                    { "Height", targetScreen.WorkingArea.Height }
                 };
 
                 this.windowManager.ShowWindow(this.photoShowViewModel, null, settings);
+
+                this.liveViewVisible = !this.liveViewVisible;
             }
-            this.liveViewVisible = !this.liveViewVisible;
         }
 
         public void ShowMeerkat()
@@ -65,6 +71,11 @@ namespace LivePhotoShow.ViewModels
         public void ShowBalloon()
         {
             this.eventAggregator.PublishOnUIThread(new ShowPhoto(@"C:\Users\tschulte\Pictures\Sample Pictures\balloon.jpg"));
+        }
+
+        public void Handle(PhotoShowClosed message)
+        {
+            this.liveViewVisible = false;
         }
     }
 }

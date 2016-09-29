@@ -75,6 +75,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="AppModule.cs" />
+    <Compile Include="Messages\PhotoShowClosed.cs" />
     <Compile Include="ViewModels\PhotoShowViewModel.cs" />
     <Compile Include="Messages\ShowPhoto.cs" />
     <Compile Include="Views\AppView.xaml.cs">
